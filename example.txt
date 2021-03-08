@@ -1,0 +1,20 @@
+gremlin> g.V().hasLabel('person').project('UserName','UserAge').by('name').by('age') 
+==>[UserName:marko,UserAge:29]
+==>[UserName:vadas,UserAge:27]
+==>[UserName:josh,UserAge:32]
+==>[UserName:peter,UserAge:35]
+==>[UserName:[Murtaza,Hanzala],UserAge:22]
+
+
+gremlin> g.V().groupCount().by(label)
+==>[software:3,person:5]
+
+
+gremlin> g.V().hasLabel('person').project('UserName','ConnectedPersons').by('name').by(out().count())
+==>[UserName:marko,ConnectedPersons:3]
+==>[UserName:vadas,ConnectedPersons:0]
+==>[UserName:josh,ConnectedPersons:2]
+==>[UserName:peter,ConnectedPersons:1]
+==>[UserName:[Murtaza,Hanzala],ConnectedPersons:0]
+
+
