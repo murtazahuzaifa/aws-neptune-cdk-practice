@@ -1,11 +1,40 @@
 //https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-node-js.html
 //https://docs.aws.amazon.com/neptune/latest/userguide/lambda-functions-examples.html
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { driver, process as gprocess, structure } from 'gremlin';
-import * as async from 'async';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context } from 'aws-lambda';
+// import { driver, process as gprocess, structure } from 'gremlin';
+// import * as async from 'async';
+import { g, gremlinQueryHandler, __ } from './gremlinQueryHandler';
 
 
+export const handler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback) => {
+    const { body } = event;
+    const { name, age } = body as any;
+    let result = {};
+
+    await gremlinQueryHandler(async () => {
+        result = await g
+            .V()
+            .elementMap()
+            .next()
+
+        console.log("Result", result);
+        // return event
+        // callback(null, result);
+        // return { message: 'success', ...result }
+
+    })
+
+    return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result),
+    };
+
+
+}
+
+/*
 declare var process: {
     env: {
         NEPTUNE_ENDPOINT: string
@@ -14,7 +43,7 @@ declare var process: {
 
 let conn: driver.DriverRemoteConnection;
 let g: gprocess.GraphTraversalSource;
-const { t: { }, P:{}, } = gprocess;
+const { t, P: { }, } = gprocess;
 const __ = gprocess.statics;
 
 
@@ -23,10 +52,11 @@ const doQuery = (event: APIGatewayProxyEvent) => async () => {
     const { name, age } = body as any;
     // const { name, age } = JSON.parse(body || "{}") as any;
     let result = await g
-        .V()
-        // .addV("person")
-        // .property("name", name)
-        // .property("age", Number(age))
+        // .V()
+        .addV("person")
+        // .property(t.id, id)
+        .property("name", name)
+        .property("age", Number(age))
         // .count()
         // .has("name", "Abbas")
         // .values()
@@ -38,11 +68,11 @@ const doQuery = (event: APIGatewayProxyEvent) => async () => {
         // .limit(100)
         // .values('name', 'age')
         // .project('id','name')
-        .hasLabel('person')
+        // .hasLabel('person')
         .elementMap()
         // .values()
-        .toList()
-    // .next()
+        // .toList()
+        .next()
 
     console.log("Result", result);
 
@@ -125,3 +155,4 @@ export async function handler(event: APIGatewayProxyEvent, context: Context) {
 
 
 }
+*/

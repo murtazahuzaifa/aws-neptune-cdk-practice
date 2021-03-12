@@ -60,7 +60,7 @@ export class Step00_Neptune_Lambda_Stack extends cdk.Stack {
     neptuneInstance.addDependsOn(neptuneCluster);
 
     // add this code after the VPC code
-    const handler = new lambda.Function(this, "Lambda", { 
+    const handler = new lambda.Function(this, "Lambda", {
       runtime: lambda.Runtime.NODEJS_10_X,
       code: new lambda.AssetCode("lambdas/lambda1"),
       handler: "index.handler",
@@ -69,20 +69,17 @@ export class Step00_Neptune_Lambda_Stack extends cdk.Stack {
       environment: {
         NEPTUNE_ENDPOINT: neptuneCluster.attrEndpoint
       },
-      vpcSubnets:
-        {
-          subnetType: ec2.SubnetType.ISOLATED                                                                                                               
-        }
+      vpcSubnets: { subnetType: ec2.SubnetType.ISOLATED }
     });
 
 
     //https://github.com/aws-samples/aws-dbs-refarch-graph/tree/master/src/accessing-from-aws-lambda
     //We will review this link and update our code latter to put the lambda outside the VPC
 
-   new cdk.CfnOutput(this, "Neptune Endpoint", {
-     value: neptuneCluster.attrEndpoint
-   }
-   )
+    new cdk.CfnOutput(this, "Neptune Endpoint", {
+      value: neptuneCluster.attrEndpoint
+    }
+    )
 
 
     const apigateway = new apigw.LambdaRestApi(this, "api", {

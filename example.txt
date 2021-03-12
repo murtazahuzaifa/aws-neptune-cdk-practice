@@ -1,3 +1,5 @@
+official docs https://tinkerpop.apache.org/docs/current/reference
+
 gremlin> g.V().hasLabel('person').project('UserName','UserAge').by('name').by('age') 
 ==>[UserName:marko,UserAge:29]
 ==>[UserName:vadas,UserAge:27]
@@ -18,3 +20,45 @@ gremlin> g.V().hasLabel('person').project('UserName','ConnectedPersons').by('nam
 ==>[UserName:[Murtaza,Hanzala],ConnectedPersons:0]
 
 
+gremlin> g.V().project('person',"knows").by(elementMap()).by(out('knows').elementMap().fold())
+==>[person:[id:1,label:person,name:marko,age:29],knows:[[id:2,label:person,name:vadas,age:27],[id:4,label:person,name:josh,age:32]]]
+==>[person:[id:2,label:person,name:vadas,age:27],knows:[]]
+==>[person:[id:3,label:software,name:lop,lang:java],knows:[]]
+==>[person:[id:4,label:person,name:josh,age:32],knows:[]]
+==>[person:[id:5,label:software,name:ripple,lang:java],knows:[]]
+==>[person:[id:6,label:person,name:peter,age:35],knows:[]]
+
+
+
+gremlin> g.V(1).as('a').V(2).as('b').select('a','b')
+==>[a:v[1],b:v[2]]
+
+
+gremlin> g.V(5).as('p1').V(6).as('p2').addE('knows').from('p1').to('p2').property('weight',0.5)
+==>e[13][5-knows->6]
+
+
+// math example
+gremlin> g.V().hasLabel('person').as('a').as('b').select('a','b').by(elementMap('name')).by(values('age').math('_+1'))
+==>[a:[id:1,label:person,name:marko],b:30.0]
+==>[a:[id:2,label:person,name:vadas],b:28.0]
+==>[a:[id:4,label:person,name:josh],b:33.0]
+==>[a:[id:6,label:person,name:peter],b:36.0]
+
+// sort example
+gremlin> g.V().hasLabel('person').as('a').as('b').select('a','b').by(elementMap()).by(values('age').math('_+1')).order().by('b')
+==>[a:[id:2,label:person,name:vadas,age:27],b:28.0]
+==>[a:[id:1,label:person,name:marko,age:29],b:30.0]
+==>[a:[id:4,label:person,name:josh,age:32],b:33.0]
+==>[a:[id:6,label:person,name:peter,age:35],b:36.0]
+
+// limit and absolute values example
+gremlin> g.V().hasLabel('person').as('a').as('b').select('a','b').by(elementMap()).by(values('age').math('_ - 40').math("abs _")).order().by('b').limit(2)
+==>[a:[id:6,label:person,name:peter,age:35],b:5.0]
+==>[a:[id:4,label:person,name:josh,age:32],b:8.0]
+
+
+g.addV('Restaurant').property(id,1).property('name','Domino').property('location','{"units":10}')\
+.addV('Restaurant').property(id,2).property('name','Shaheen Shenwari').property('location','{"units":50}')\
+.addV('Restaurant').property(id,3).property('name','Flamingo').property('location','{"units":-50}')\
+.addV('Restaurant').property(id,4).property('name','Cafe Pyala').property('location','{"units":20}')
